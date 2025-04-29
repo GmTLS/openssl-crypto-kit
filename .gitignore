@@ -1,0 +1,12 @@
+composer.lock
+pnpm-lock.yaml
+docs/.vuepress/.cache
+docs/.vuepress/.temp
+docs/.vuepress/dist
+node_modules
+vendor
+/.fleet
+/.idea
+/.nova
+/.vscode
+/.zed
