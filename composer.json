@@ -12,7 +12,7 @@
     ],
     "type": "library",
     "license": "MIT",
-    "homepage": "https://github.com/dependencies-packagist/gmtls-openssl-crypto-kit",
+    "homepage": "https://github.com/dependencies-packagist/openssl-crypto-kit",
     "authors": [
         {
             "name": "jundayw",

@@ -3,11 +3,11 @@
 A modern and extensible PHP cryptography toolkit powered by OpenSSL.  
 Supports RSA / EC key generation, encryption, decryption, signing, verification, and X.509 certificate creation — with passphrase protection and pluggable algorithm support.
 
-[![GitHub Tag](https://img.shields.io/github/v/tag/dependencies-packagist/jwt)](https://github.com/dependencies-packagist/jwt/tags)
-[![Total Downloads](https://img.shields.io/packagist/dt/token/jwt?style=flat-square)](https://packagist.org/packages/token/jwt)
-[![Packagist Version](https://img.shields.io/packagist/v/token/jwt)](https://packagist.org/packages/token/jwt)
-[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/token/jwt)](https://github.com/dependencies-packagist/jwt)
-[![Packagist License](https://img.shields.io/github/license/dependencies-packagist/jwt)](https://github.com/dependencies-packagist/jwt)
+[![GitHub Tag](https://img.shields.io/github/v/tag/dependencies-packagist/openssl-crypto-kit)](https://github.com/dependencies-packagist/openssl-crypto-kit/tags)
+[![Total Downloads](https://img.shields.io/packagist/dt/gmtls/openssl-crypto-kit?style=flat-square)](https://packagist.org/packages/gmtls/openssl-crypto-kit)
+[![Packagist Version](https://img.shields.io/packagist/v/gmtls/openssl-crypto-kit)](https://packagist.org/packages/gmtls/openssl-crypto-kit)
+[![Packagist PHP Version Support](https://img.shields.io/packagist/php-v/gmtls/openssl-crypto-kit)](https://github.com/dependencies-packagist/openssl-crypto-kit)
+[![Packagist License](https://img.shields.io/github/license/dependencies-packagist/openssl-crypto-kit)](https://github.com/dependencies-packagist/openssl-crypto-kit)
 
 ## Installation
 
