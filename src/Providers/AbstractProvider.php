@@ -2,8 +2,8 @@
 
 namespace GmTLS\CryptoKit\Providers;
 
-use GmTLS\CryptoKit\Concerns\Base64UrlConverter;
-use GmTLS\CryptoKit\Contracts\Base64UrlConverter as Base64Url;
+use GmTLS\CryptoKit\Encoding\Encoder;
+use GmTLS\CryptoKit\Contracts\Encoding;
 use GmTLS\CryptoKit\Contracts\Keypair;
 use GmTLS\CryptoKit\Contracts\Provider;
 use InvalidArgumentException;
@@ -12,11 +12,11 @@ use RuntimeException;
 abstract class AbstractProvider implements Provider
 {
     public function __construct(
-        protected Keypair    $keypair,
-        protected ?Base64Url $base64Ur = null,
+        protected Keypair   $keypair,
+        protected ?Encoding $encoder = null,
     )
     {
-        $this->base64Ur ??= new Base64UrlConverter();
+        $this->encoder ??= new Encoder();
     }
 
 

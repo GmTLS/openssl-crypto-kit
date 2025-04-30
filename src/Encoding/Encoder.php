@@ -1,17 +1,17 @@
 <?php
 
-namespace GmTLS\CryptoKit\Concerns;
+namespace GmTLS\CryptoKit\Encoding;
 
-use GmTLS\CryptoKit\Contracts\Base64UrlConverter as Base64Url;
+use GmTLS\CryptoKit\Contracts\Encoding;
 
-class Base64UrlConverter implements Base64Url
+class Encoder implements Encoding
 {
     /**
      * {@inheritdoc}
      *
      * @return string
      */
-    public function decode(string $data, bool $strict = false): string
+    public function base64UrlDecode(string $data, bool $strict = false): string
     {
         return base64_decode(strtr($data, '-_', '+/'), $strict);
     }
@@ -21,7 +21,7 @@ class Base64UrlConverter implements Base64Url
      *
      * @return string
      */
-    public function encode(string $data): string
+    public function base64UrlEncode(string $data): string
     {
         return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
     }

@@ -108,12 +108,12 @@ class EcProvider extends AbstractProvider
         $keys = [
             'kty' => 'EC',
             'crv' => $crv,
-            'x'   => $this->base64Ur->encode($x),
-            'y'   => $this->base64Ur->encode($y),
+            'x'   => $this->encoder->base64UrlEncode($x),
+            'y'   => $this->encoder->base64UrlEncode($y),
         ];
 
         if (array_key_exists('d', $details['ec'])) {
-            $keys['d'] = $this->base64Ur->encode($details['ec']['d']);
+            $keys['d'] = $this->encoder->base64UrlEncode($details['ec']['d']);
         }
 
         return $keys;

@@ -52,9 +52,9 @@ $key->fromFile(realpath('key.pem'), 'password');
 Save the key to a file
 
 ```php
-$key->savePrivateKeyTo(__DIR__ . '/private.pem');
-$key->savePublicKeyTo(__DIR__ . '/public.pem');
-$key->saveTo(__DIR__ . '/key.pem');
+$key->savePrivateKey(__DIR__ . '/private.pem');
+$key->savePublicKey(__DIR__ . '/public.pem');
+$key->saveKeys(__DIR__ . '/key.pem');
 ```
 
 ### Signing && Verification

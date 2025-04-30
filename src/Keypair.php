@@ -121,7 +121,7 @@ class Keypair implements KeypairContract
         return $this;
     }
 
-    public function saveTo(string $file, bool $overwrite = false): bool
+    public function saveKeys(string $file, bool $overwrite = false): bool
     {
         $this->ensureWritableDirectory($file, $overwrite);
 
@@ -138,7 +138,7 @@ class Keypair implements KeypairContract
         return true;
     }
 
-    public function savePrivateKeyTo(string $file, bool $overwrite = false): bool
+    public function savePrivateKey(string $file, bool $overwrite = false): bool
     {
         $this->ensureWritableDirectory($file, $overwrite);
 
@@ -153,7 +153,7 @@ class Keypair implements KeypairContract
         return true;
     }
 
-    public function savePublicKeyTo(string $file, bool $overwrite = false): bool
+    public function savePublicKey(string $file, bool $overwrite = false): bool
     {
         $this->ensureWritableDirectory($file, $overwrite);
 

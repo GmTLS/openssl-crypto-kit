@@ -2,7 +2,7 @@
 
 namespace GmTLS\CryptoKit\Contracts;
 
-interface Base64UrlConverter
+interface Encoding
 {
     /**
      * Decodes Base64url formatted data to a string.
@@ -12,7 +12,7 @@ interface Base64UrlConverter
      *
      * @return string
      */
-    public function decode(string $data, bool $strict = false): string;
+    public function base64UrlDecode(string $data, bool $strict = false): string;
 
     /**
      * Encodes a string to a base64url formatted data.
@@ -21,5 +21,5 @@ interface Base64UrlConverter
      *
      * @return string
      */
-    public function encode(string $data): string;
+    public function base64UrlEncode(string $data): string;
 }

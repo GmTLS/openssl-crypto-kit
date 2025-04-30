@@ -48,17 +48,17 @@ class RsaProvider extends AbstractProvider
     {
         $keys = [
             'kty' => 'RSA',
-            'n'   => $this->base64Ur->encode($details['rsa']['n']),
-            'e'   => $this->base64Ur->encode($details['rsa']['e']),
+            'n'   => $this->encoder->base64UrlEncode($details['rsa']['n']),
+            'e'   => $this->encoder->base64UrlEncode($details['rsa']['e']),
         ];
 
         if (array_key_exists('d', $details['rsa'])) {
-            $keys['d']  = $this->base64Ur->encode($details['rsa']['d']);
-            $keys['p']  = $this->base64Ur->encode($details['rsa']['p']);
-            $keys['q']  = $this->base64Ur->encode($details['rsa']['q']);
-            $keys['dp'] = $this->base64Ur->encode($details['rsa']['dmp1']);
-            $keys['dq'] = $this->base64Ur->encode($details['rsa']['dmq1']);
-            $keys['qi'] = $this->base64Ur->encode($details['rsa']['iqmp']);
+            $keys['d']  = $this->encoder->base64UrlEncode($details['rsa']['d']);
+            $keys['p']  = $this->encoder->base64UrlEncode($details['rsa']['p']);
+            $keys['q']  = $this->encoder->base64UrlEncode($details['rsa']['q']);
+            $keys['dp'] = $this->encoder->base64UrlEncode($details['rsa']['dmp1']);
+            $keys['dq'] = $this->encoder->base64UrlEncode($details['rsa']['dmq1']);
+            $keys['qi'] = $this->encoder->base64UrlEncode($details['rsa']['iqmp']);
         }
 
         return $keys;
