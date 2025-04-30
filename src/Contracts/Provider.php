@@ -4,6 +4,10 @@ namespace GmTLS\CryptoKit\Contracts;
 
 interface Provider
 {
+    public function getPrivateKeys(): array;
+
+    public function getPublicKeys(): array;
+
     /**
      * Encrypt data with provided public certificate
      *

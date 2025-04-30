@@ -2,7 +2,9 @@
 
 namespace GmTLS\CryptoKit\Providers;
 
-use GmTLS\CryptoKit\Contracts\Key;
+use GmTLS\CryptoKit\Concerns\Base64UrlConverter;
+use GmTLS\CryptoKit\Contracts\Base64UrlConverter as Base64Url;
+use GmTLS\CryptoKit\Contracts\Keypair;
 use GmTLS\CryptoKit\Contracts\Provider;
 use InvalidArgumentException;
 use RuntimeException;
@@ -10,11 +12,57 @@ use RuntimeException;
 abstract class AbstractProvider implements Provider
 {
     public function __construct(
-        protected Key $key,
+        protected Keypair    $keypair,
+        protected ?Base64Url $base64Ur = null,
     )
     {
-        //
+        $this->base64Ur ??= new Base64UrlConverter();
     }
+
+
+    public function getPrivateKeys(): array
+    {
+        $privateKey = $this->keypair->getPrivateKey();
+
+        if (is_null($privateKey)) {
+            throw new RuntimeException('Invalid private key');
+        }
+
+        $resource = openssl_pkey_get_private($privateKey, $this->keypair->getPassphrase());
+        if ($resource === false) {
+            throw new RuntimeException('Invalid private key');
+        }
+
+        $details = openssl_pkey_get_details($resource);
+        if ($details === false) {
+            throw new RuntimeException('Failed to get key details');
+        }
+
+        return $this->converterToKeys($details);
+    }
+
+    public function getPublicKeys(): array
+    {
+        $publicKey = $this->keypair->getPublicKey();
+
+        if (is_null($publicKey)) {
+            throw new RuntimeException('Invalid private key');
+        }
+
+        $resource = openssl_pkey_get_public($publicKey);
+        if ($resource === false) {
+            throw new RuntimeException('Invalid public key');
+        }
+
+        $details = openssl_pkey_get_details($resource);
+        if ($details === false) {
+            throw new RuntimeException('Failed to get key details');
+        }
+
+        return $this->converterToKeys($details);
+    }
+
+    abstract protected function converterToKeys(array $details): array;
 
     /**
      * Encrypt data with provided public certificate
@@ -26,11 +74,11 @@ abstract class AbstractProvider implements Provider
      */
     public function encrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
     {
-        if (is_null($this->key->getPublicKey())) {
+        if (is_null($this->keypair->getPublicKey())) {
             throw new RuntimeException("Unable to encrypt: No public key provided.");
         }
 
-        $publicKey = openssl_pkey_get_public($this->key->getPublicKey());
+        $publicKey = openssl_pkey_get_public($this->keypair->getPublicKey());
 
         if ($publicKey === false) {
             throw new RuntimeException("OpenSSL: Unable to get public key for encryption. Is the location correct? Does this key require a password?");
@@ -66,11 +114,11 @@ abstract class AbstractProvider implements Provider
      */
     public function decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
     {
-        if (is_null($this->key->getPrivateKey())) {
+        if (is_null($this->keypair->getPrivateKey())) {
             throw new RuntimeException("Unable to decrypt: No private key provided.");
         }
 
-        $privateKey = openssl_pkey_get_private($this->key->getPrivateKey(), $this->key->getPassphrase());
+        $privateKey = openssl_pkey_get_private($this->keypair->getPrivateKey(), $this->keypair->getPassphrase());
         if ($privateKey === false) {
             throw new RuntimeException('OpenSSL: Unable to get private key for decryption. Is the location correct? If this key requires a password, have you supplied the correct one?');
         }
@@ -105,11 +153,11 @@ abstract class AbstractProvider implements Provider
      */
     public function sign(string $data, int $algorithm = OPENSSL_ALGO_SHA256): string
     {
-        if (is_null($this->key->getPrivateKey())) {
+        if (is_null($this->keypair->getPrivateKey())) {
             throw new RuntimeException("Unable to sign: No private key provided.");
         }
 
-        $privateKey = openssl_pkey_get_private($this->key->getPrivateKey(), $this->key->getPassphrase());
+        $privateKey = openssl_pkey_get_private($this->keypair->getPrivateKey(), $this->keypair->getPassphrase());
 
         if ($privateKey === false) {
             throw new RuntimeException("OpenSSL: Unable to get private key for signing. Is the key correct? Does it require a passphrase?");
@@ -146,11 +194,11 @@ abstract class AbstractProvider implements Provider
      */
     public function verify(string $data, string $signature, int $algorithm = OPENSSL_ALGO_SHA256): bool
     {
-        if (is_null($this->key->getPublicKey())) {
+        if (is_null($this->keypair->getPublicKey())) {
             throw new RuntimeException("Unable to verify: No public key provided.");
         }
 
-        $publicKey = openssl_pkey_get_public($this->key->getPublicKey());
+        $publicKey = openssl_pkey_get_public($this->keypair->getPublicKey());
 
         if ($publicKey === false) {
             throw new RuntimeException("OpenSSL: Unable to get public key for verification. Is the key correct?");

@@ -3,7 +3,7 @@
 namespace GmTLS\CryptoKit;
 
 use Closure;
-use GmTLS\CryptoKit\Contracts\Key;
+use GmTLS\CryptoKit\Contracts\Keypair;
 use GmTLS\CryptoKit\Contracts\Provider;
 use GmTLS\CryptoKit\Providers\EcProvider;
 use GmTLS\CryptoKit\Providers\RsaProvider;
@@ -33,21 +33,21 @@ class Factory
      * Create the user provider implementation for the provider.
      * Resolve the given provider.
      *
-     * @param Key $key
+     * @param Keypair $keypair
      *
      * @return Provider
      */
-    public static function provider(Key $key): Provider
+    public static function provider(Keypair $keypair): Provider
     {
-        $type = $key->get('type');
+        $type = $keypair->get('type');
 
         if (isset(self::$customProviderCreators[$type])) {
-            return call_user_func(self::$customProviderCreators[$type], $key);
+            return call_user_func(self::$customProviderCreators[$type], $keypair);
         }
 
         return match ($type) {
-            OPENSSL_KEYTYPE_RSA => self::createRsaProvider($key),
-            OPENSSL_KEYTYPE_EC => self::createEcProvider($key),
+            OPENSSL_KEYTYPE_RSA => self::createRsaProvider($keypair),
+            OPENSSL_KEYTYPE_EC => self::createEcProvider($keypair),
             default => throw new InvalidArgumentException(
                 "CryptoKit user provider [{$type}] is not defined."
             ),
@@ -55,22 +55,22 @@ class Factory
     }
 
     /**
-     * @param Key $key
+     * @param Keypair $keypair
      *
      * @return RsaProvider
      */
-    public static function createRsaProvider(Key $key): RsaProvider
+    public static function createRsaProvider(Keypair $keypair): RsaProvider
     {
-        return new RsaProvider($key);
+        return new RsaProvider($keypair);
     }
 
     /**
-     * @param Key $key
+     * @param Keypair $keypair
      *
      * @return EcProvider
      */
-    public static function createEcProvider(Key $key): EcProvider
+    public static function createEcProvider(Keypair $keypair): EcProvider
     {
-        return new EcProvider($key);
+        return new EcProvider($keypair);
     }
 }

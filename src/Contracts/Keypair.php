@@ -2,7 +2,7 @@
 
 namespace GmTLS\CryptoKit\Contracts;
 
-interface Key
+interface Keypair
 {
     public function fromFile(string $file, string $passphrase = null): static;
 

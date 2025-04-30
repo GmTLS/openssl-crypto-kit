@@ -2,10 +2,10 @@
 
 namespace GmTLS\CryptoKit;
 
-use GmTLS\CryptoKit\Contracts\Key as KeyContract;
+use GmTLS\CryptoKit\Contracts\Keypair as KeypairContract;
 use RuntimeException;
 
-class Key implements KeyContract
+class Keypair implements KeypairContract
 {
     public function __construct(
         protected ?string $privateKey = null,
@@ -81,17 +81,17 @@ class Key implements KeyContract
             throw new RuntimeException('Failed to get key details');
         }
 
-        $key = new Key(
+        $keypair = new Keypair(
             privateKey: $privateKeyPem,
             publicKey: $details['key'],
             passphrase: $passphrase,
             options: $details,
         );
 
-        $this->setPrivateKey($key->getPrivateKey());
-        $this->setPublicKey($key->getPublicKey());
-        $this->setPassphrase($key->getPassphrase());
-        $this->setOptions($key->getOptions());
+        $this->setPrivateKey($keypair->getPrivateKey());
+        $this->setPublicKey($keypair->getPublicKey());
+        $this->setPassphrase($keypair->getPassphrase());
+        $this->setOptions($keypair->getOptions());
 
         return $this;
     }
@@ -108,15 +108,15 @@ class Key implements KeyContract
             throw new RuntimeException('Failed to get key details');
         }
 
-        $key = new Key(
+        $keypair = new Keypair(
             publicKey: $details['key'],
             options: $details,
         );
 
-        $this->setPrivateKey($key->getPrivateKey());
-        $this->setPublicKey($key->getPublicKey());
-        $this->setPassphrase($key->getPassphrase());
-        $this->setOptions($key->getOptions());
+        $this->setPrivateKey($keypair->getPrivateKey());
+        $this->setPublicKey($keypair->getPublicKey());
+        $this->setPassphrase($keypair->getPassphrase());
+        $this->setOptions($keypair->getOptions());
 
         return $this;
     }
