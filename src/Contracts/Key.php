@@ -4,6 +4,24 @@ namespace GmTLS\CryptoKit\Contracts;
 
 interface Key
 {
+    public function fromFile(string $file, string $passphrase = null): static;
+
+    public function fromPrivateKeyFile(string $file, string $passphrase = null): static;
+
+    public function fromPublicKeyFile(string $file): static;
+
+    public function fromString(string $pemKey, string $passphrase = null): static;
+
+    public function fromPrivateKeyString(string $privateKeyPem, string $passphrase = null): static;
+
+    public function fromPublicKeyString(string $publicKeyPem): static;
+
+    public function saveTo(string $file, bool $overwrite = false): bool;
+
+    public function savePrivateKeyTo(string $file, bool $overwrite = false): bool;
+
+    public function savePublicKeyTo(string $file, bool $overwrite = false): bool;
+
     public function getPrivateKey(): ?string;
 
     public function setPrivateKey(?string $privateKey): static;
