@@ -10,7 +10,7 @@ use RuntimeException;
 abstract class AbstractProvider implements Provider
 {
     public function __construct(
-        protected ?Key $key = null,
+        protected Key $key,
     )
     {
         //
