@@ -123,8 +123,14 @@ class EcProvider extends AbstractProvider
             default => throw new InvalidArgumentException("Unsupported curve: {$crv}"),
         };
 
+        // EC Private Key
+        // PrivateKeyInfo ::= SEQUENCE {
+        //     version                   INTEGER,
+        //     privateKeyAlgorithm       AlgorithmIdentifier,
+        //     privateKey                OCTET STRING,
+        //     attributes           [0]  IMPLICIT Attributes OPTIONAL
+        // }
         if (isset($jwk['d'])) {
-            // EC Private Key
             $sequence = self::encodeSequence(
                 self::encodeInteger("\x01") .
                 self::encodeOctetString($this->encoder->base64UrlDecode($jwk['d'])) .
@@ -133,17 +139,16 @@ class EcProvider extends AbstractProvider
             );
 
             return self::wrapKey($sequence, 'EC PRIVATE KEY');
-        } else {
-            // EC Public Key
-            $algorithm = self::encodeSequence(
-                self::encodeOID(hex2bin('2A8648CE3D0201')) .
-                self::encodeOID($oid)
-            );
-            $bitString = self::encodeBitString($publicKey);
-            $sequence  = self::encodeSequence($algorithm . $bitString);
-
-            return self::wrapKey($sequence, 'PUBLIC KEY');
         }
+        // EC Public Key
+        $algorithm = self::encodeSequence(
+            self::encodeOID(hex2bin('2A8648CE3D0201')) .
+            self::encodeOID($oid)
+        );
+        $bitString = self::encodeBitString($publicKey);
+        $sequence  = self::encodeSequence($algorithm . $bitString);
+
+        return self::wrapKey($sequence, 'PUBLIC KEY');
     }
 
     /**

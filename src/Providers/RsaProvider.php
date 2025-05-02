@@ -81,8 +81,15 @@ class RsaProvider extends AbstractProvider
     {
         $jwk = $jwk ?: $this->getEncodedKeys();
 
+        // Private Key
+        // RSAPrivateKey ::= SEQUENCE {
+        //     version           Version,
+        //     modulus           INTEGER,  -- n
+        //     publicExponent    INTEGER,  -- e
+        //     privateExponent   INTEGER,  -- d
+        //     ...
+        // }
         if (isset($jwk['d'])) {
-            // Private Key
             if (count($fields = array_diff(['n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi'], array_keys($jwk)))) {
                 throw new InvalidArgumentException(sprintf(
                     "Missing field %s in RSA private JWK",
@@ -114,32 +121,31 @@ class RsaProvider extends AbstractProvider
             );
 
             return self::wrapKey($encoded, 'RSA PRIVATE KEY');
-        } else {
-            // Public Key
-            if (count($fields = array_diff(['n', 'e'], array_keys($jwk)))) {
-                throw new InvalidArgumentException(sprintf(
-                    "Missing field %s in RSA public JWK",
-                    implode(', ', $fields)
-                ));
-            }
-
-            $components = array_map([$this->encoder, 'base64urlDecode'], [
-                'n' => $jwk['n'],
-                'e' => $jwk['e'],
-            ]);
-
-            $encoded = self::encodeSequence(
-                self::encodeInteger($components['n']) .
-                self::encodeInteger($components['e'])
-            );
-
-            // RSA OID
-            $encoded = self::encodeSequence(
-                hex2bin('300d06092a864886f70d0101010500') .
-                self::encodeBitString($encoded)
-            );
-
-            return self::wrapKey($encoded, 'PUBLIC KEY');
         }
+        // Public Key
+        if (count($fields = array_diff(['n', 'e'], array_keys($jwk)))) {
+            throw new InvalidArgumentException(sprintf(
+                "Missing field %s in RSA public JWK",
+                implode(', ', $fields)
+            ));
+        }
+
+        $components = array_map([$this->encoder, 'base64urlDecode'], [
+            'n' => $jwk['n'],
+            'e' => $jwk['e'],
+        ]);
+
+        $encoded = self::encodeSequence(
+            self::encodeInteger($components['n']) .
+            self::encodeInteger($components['e'])
+        );
+
+        // RSA OID
+        $encoded = self::encodeSequence(
+            hex2bin('300d06092a864886f70d0101010500') .
+            self::encodeBitString($encoded)
+        );
+
+        return self::wrapKey($encoded, 'PUBLIC KEY');
     }
 }
