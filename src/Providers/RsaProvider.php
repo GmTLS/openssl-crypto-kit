@@ -2,12 +2,16 @@
 
 namespace GmTLS\CryptoKit\Providers;
 
+use GmTLS\CryptoKit\Concerns\EncodeParameters;
 use GmTLS\CryptoKit\Contracts\Keypair as KeypairContract;
 use GmTLS\CryptoKit\Keypair;
+use InvalidArgumentException;
 use RuntimeException;
 
 class RsaProvider extends AbstractProvider
 {
+    use EncodeParameters;
+
     /**
      * @param int         $keySize
      * @param string|null $passphrase
@@ -26,7 +30,10 @@ class RsaProvider extends AbstractProvider
             throw new RuntimeException('[OpenSSL Error] Failed to generate RSA key pair.');
         }
 
-        $export = openssl_pkey_export($resource, $privateKey, $passphrase);
+        $export = openssl_pkey_export($resource, $privateKey, $passphrase, [
+            'encrypt_key' => false,
+            'type'        => OPENSSL_KEYTYPE_RSA,
+        ]);
         if ($export === false) {
             throw new RuntimeException('[OpenSSL Error] key parameter is not a valid private key');
         }
@@ -68,5 +75,71 @@ class RsaProvider extends AbstractProvider
         }
 
         return $keys;
+    }
+
+    public function toUnencryptedPem(array $jwk = []): string
+    {
+        $jwk = $jwk ?: $this->getEncodedKeys();
+
+        if (isset($jwk['d'])) {
+            // Private Key
+            if (count($fields = array_diff(['n', 'e', 'd', 'p', 'q', 'dp', 'dq', 'qi'], array_keys($jwk)))) {
+                throw new InvalidArgumentException(sprintf(
+                    "Missing field %s in RSA private JWK",
+                    implode(', ', $fields)
+                ));
+            }
+
+            $components = array_map([$this->encoder, 'base64urlDecode'], [
+                'n'  => $jwk['n'],
+                'e'  => $jwk['e'],
+                'd'  => $jwk['d'],
+                'p'  => $jwk['p'],
+                'q'  => $jwk['q'],
+                'dp' => $jwk['dp'],
+                'dq' => $jwk['dq'],
+                'qi' => $jwk['qi'],
+            ]);
+
+            $encoded = self::encodeSequence(
+                self::encodeInteger("\x00") .
+                self::encodeInteger($components['n']) .
+                self::encodeInteger($components['e']) .
+                self::encodeInteger($components['d']) .
+                self::encodeInteger($components['p']) .
+                self::encodeInteger($components['q']) .
+                self::encodeInteger($components['dp']) .
+                self::encodeInteger($components['dq']) .
+                self::encodeInteger($components['qi'])
+            );
+
+            return self::wrapKey($encoded, 'RSA PRIVATE KEY');
+        } else {
+            // Public Key
+            if (count($fields = array_diff(['n', 'e'], array_keys($jwk)))) {
+                throw new InvalidArgumentException(sprintf(
+                    "Missing field %s in RSA public JWK",
+                    implode(', ', $fields)
+                ));
+            }
+
+            $components = array_map([$this->encoder, 'base64urlDecode'], [
+                'n' => $jwk['n'],
+                'e' => $jwk['e'],
+            ]);
+
+            $encoded = self::encodeSequence(
+                self::encodeInteger($components['n']) .
+                self::encodeInteger($components['e'])
+            );
+
+            // RSA OID
+            $encoded = self::encodeSequence(
+                hex2bin('300d06092a864886f70d0101010500') .
+                self::encodeBitString($encoded)
+            );
+
+            return self::wrapKey($encoded, 'PUBLIC KEY');
+        }
     }
 }

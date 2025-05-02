@@ -2,12 +2,16 @@
 
 namespace GmTLS\CryptoKit\Providers;
 
+use GmTLS\CryptoKit\Concerns\EncodeParameters;
 use GmTLS\CryptoKit\Contracts\Keypair as KeypairContract;
 use GmTLS\CryptoKit\Keypair;
+use InvalidArgumentException;
 use RuntimeException;
 
 class EcProvider extends AbstractProvider
 {
+    use EncodeParameters;
+
     /**
      * @param string      $curveName
      * @param string|null $passphrase
@@ -31,7 +35,10 @@ class EcProvider extends AbstractProvider
             throw new RuntimeException('[OpenSSL Error] Failed to generate RSA key pair.');
         }
 
-        $export = openssl_pkey_export($resource, $privateKey, $passphrase);
+        $export = openssl_pkey_export($resource, $privateKey, $passphrase, [
+            'encrypt_key' => false,
+            'type'        => OPENSSL_KEYTYPE_EC,
+        ]);
         if ($export === false) {
             throw new RuntimeException('[OpenSSL Error] key parameter is not a valid private key');
         }
@@ -84,6 +91,59 @@ class EcProvider extends AbstractProvider
         }
 
         return $keys;
+    }
+
+    public function toUnencryptedPem(array $jwk = []): string
+    {
+        $jwk = $jwk ?: $this->getEncodedKeys();
+
+        if (count($fields = array_diff(['crv', 'x', 'y'], array_keys($jwk)))) {
+            throw new InvalidArgumentException(sprintf(
+                "Missing field %s in EC JWK",
+                implode(', ', $fields)
+            ));
+        }
+
+        $crv         = $jwk['crv'];
+        $curveLength = match ($crv) {
+            'P-256' => 32,
+            'P-384' => 48,
+            'P-521' => 66, // 注意P-521实际是528bit -> 66字节
+            default => throw new InvalidArgumentException('Unsupported curve length.'),
+        };
+        $components  = [
+            'x' => str_pad($this->encoder->base64urlDecode($jwk['x']), $curveLength, "\x00", STR_PAD_LEFT),
+            'y' => str_pad($this->encoder->base64urlDecode($jwk['y']), $curveLength, "\x00", STR_PAD_LEFT),
+        ];
+        $publicKey   = "\x04" . $components['x'] . $components['y']; // Uncompressed point
+        $oid         = match ($crv) {
+            'P-256' => hex2bin('2A8648CE3D030107'),
+            'P-384' => hex2bin('2B81040022'),
+            'P-521' => hex2bin('2B81040023'),
+            default => throw new InvalidArgumentException("Unsupported curve: {$crv}"),
+        };
+
+        if (isset($jwk['d'])) {
+            // EC Private Key
+            $sequence = self::encodeSequence(
+                self::encodeInteger("\x01") .
+                self::encodeOctetString($this->encoder->base64UrlDecode($jwk['d'])) .
+                self::encodeTagged(0, self::encodeOID($oid)) .
+                self::encodeTagged(1, self::encodeBitString($publicKey))
+            );
+
+            return self::wrapKey($sequence, 'EC PRIVATE KEY');
+        } else {
+            // EC Public Key
+            $algorithm = self::encodeSequence(
+                self::encodeOID(hex2bin('2A8648CE3D0201')) .
+                self::encodeOID($oid)
+            );
+            $bitString = self::encodeBitString($publicKey);
+            $sequence  = self::encodeSequence($algorithm . $bitString);
+
+            return self::wrapKey($sequence, 'PUBLIC KEY');
+        }
     }
 
     /**

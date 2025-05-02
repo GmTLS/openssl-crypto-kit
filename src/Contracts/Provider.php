@@ -8,7 +8,17 @@ interface Provider
 
     public function getKeyType(): string;
 
+    public function getPrivateEncodedKeys(): array;
+
+    public function getPublicEncodedKeys(): array;
+
     public function getEncodedKeys(array $details = []): array;
+
+    public function toUnencryptedPrivateKeyPem(): string;
+
+    public function toUnencryptedPublicKeyPem(): string;
+
+    public function toUnencryptedPem(array $jwk = []): string;
 
     /**
      * Encrypt data with provided public certificate

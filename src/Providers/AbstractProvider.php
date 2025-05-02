@@ -19,6 +19,74 @@ abstract class AbstractProvider implements Provider
         $this->encoder ??= new Encoder();
     }
 
+    public function getKeypair(): Keypair
+    {
+        return $this->keypair;
+    }
+
+    public function getEncoder(): Encoding
+    {
+        return $this->encoder;
+    }
+
+    abstract public function getKeyType(): string;
+
+    public function getPrivateEncodedKeys(): array
+    {
+        $privateKey = $this->keypair->getPrivateKey();
+
+        if (is_null($privateKey)) {
+            throw new RuntimeException('Invalid private key');
+        }
+
+        $resource = openssl_pkey_get_private($privateKey, $this->keypair->getPassphrase());
+        if ($resource === false) {
+            throw new RuntimeException('Invalid private key');
+        }
+
+        $details = openssl_pkey_get_details($resource);
+        if ($details === false) {
+            throw new RuntimeException('Failed to get key details');
+        }
+
+        return $this->getEncodedKeys($details);
+    }
+
+    public function getPublicEncodedKeys(): array
+    {
+        $publicKey = $this->keypair->getPublicKey();
+
+        if (is_null($publicKey)) {
+            throw new RuntimeException('Invalid private key');
+        }
+
+        $resource = openssl_pkey_get_public($publicKey);
+        if ($resource === false) {
+            throw new RuntimeException('Invalid public key');
+        }
+
+        $details = openssl_pkey_get_details($resource);
+        if ($details === false) {
+            throw new RuntimeException('Failed to get key details');
+        }
+
+        return $this->getEncodedKeys($details);
+    }
+
+    abstract public function getEncodedKeys(array $details = []): array;
+
+    public function toUnencryptedPrivateKeyPem(): string
+    {
+        return $this->toUnencryptedPem($this->getPrivateEncodedKeys());
+    }
+
+    public function toUnencryptedPublicKeyPem(): string
+    {
+        return $this->toUnencryptedPem($this->getPublicEncodedKeys());
+    }
+
+    abstract public function toUnencryptedPem(array $jwk = []): string;
+
     /**
      * Encrypt data with provided public certificate
      *
