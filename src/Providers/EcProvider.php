@@ -9,46 +9,6 @@ use RuntimeException;
 class EcProvider extends AbstractProvider
 {
     /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function encrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
-    {
-        throw new RuntimeException('operation not supported for this key type');
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function base64Encrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
-    {
-        throw new RuntimeException('operation not supported for this key type');
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
-    {
-        throw new RuntimeException('operation not supported for this key type');
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function base64Decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
-    {
-        throw new RuntimeException('operation not supported for this key type');
-    }
-
-    /**
      * @param string      $curveName
      * @param string|null $passphrase
      * @param array       $options
@@ -124,5 +84,45 @@ class EcProvider extends AbstractProvider
         }
 
         return $keys;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function encrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
+    {
+        throw new RuntimeException('operation not supported for this key type');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function base64Encrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
+    {
+        throw new RuntimeException('operation not supported for this key type');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
+    {
+        throw new RuntimeException('operation not supported for this key type');
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * @return string
+     */
+    public function base64Decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
+    {
+        throw new RuntimeException('operation not supported for this key type');
     }
 }

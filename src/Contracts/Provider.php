@@ -4,6 +4,10 @@ namespace GmTLS\CryptoKit\Contracts;
 
 interface Provider
 {
+    public static function generateKeypair(): Keypair;
+
+    public function getKeyType(): string;
+
     public function getEncodedKeys(): array;
 
     /**

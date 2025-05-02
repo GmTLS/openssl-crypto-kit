@@ -114,7 +114,12 @@ class YourProvider extends AbstractProvider
         );
     }
 
-    protected function converterToKeys(array $details): array
+    public function getKeyType(): string
+    {
+        return '...';
+    }
+
+    public function getEncodedKeys(): array
     {
         // ...
         return [];
@@ -136,8 +141,6 @@ Factory::extend(YourProvider::class, function (Keypair $keypair) {
 Calling using Factory:
 
 ```php
-Factory::provider(YourProvider::class)->getPrivateKeys();
-Factory::provider(YourProvider::class)->getPublicKeys();
 Factory::provider(YourProvider::class)->sign($data);
 Factory::provider(YourProvider::class)->verify($data, $sign);
 // ...
