@@ -166,27 +166,7 @@ class EcProvider extends AbstractProvider
      *
      * @return string
      */
-    public function base64Encrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
-    {
-        throw new RuntimeException('operation not supported for this key type');
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
     public function decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
-    {
-        throw new RuntimeException('operation not supported for this key type');
-    }
-
-    /**
-     * @inheritdoc
-     *
-     * @return string
-     */
-    public function base64Decrypt(string $data, int $padding = OPENSSL_PKCS1_PADDING): string
     {
         throw new RuntimeException('operation not supported for this key type');
     }
