@@ -119,7 +119,7 @@ class YourProvider extends AbstractProvider
         return '...';
     }
 
-    public function getEncodedKeys(): array
+    public function getEncodedKeys(array $details = []): array
     {
         // ...
         return [];
