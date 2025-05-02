@@ -8,7 +8,7 @@ interface Provider
 
     public function getKeyType(): string;
 
-    public function getEncodedKeys(): array;
+    public function getEncodedKeys(array $details = []): array;
 
     /**
      * Encrypt data with provided public certificate

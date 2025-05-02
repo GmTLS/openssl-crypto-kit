@@ -49,9 +49,9 @@ class RsaProvider extends AbstractProvider
         return 'rsa';
     }
 
-    public function getEncodedKeys(): array
+    public function getEncodedKeys(array $details = []): array
     {
-        $details = $this->keypair->getOptions();
+        $details = $details ?: $this->keypair->getOptions();
         $keys    = [
             'kty' => 'RSA',
             'n'   => $this->encoder->base64UrlEncode($details['rsa']['n']),
