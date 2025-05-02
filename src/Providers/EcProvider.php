@@ -89,8 +89,15 @@ class EcProvider extends AbstractProvider
         );
     }
 
-    protected function converterToKeys(array $details): array
+    public function getKeyType(): string
     {
+        return 'ec';
+    }
+
+    public function getEncodedKeys(): array
+    {
+        $details = $this->keypair->getOptions();
+
         if (is_null($curveName = $details['ec']['curve_name'] ?: null)) {
             throw new RuntimeException('Missing EC curve name');
         }

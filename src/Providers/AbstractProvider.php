@@ -19,51 +19,6 @@ abstract class AbstractProvider implements Provider
         $this->encoder ??= new Encoder();
     }
 
-
-    public function getPrivateKeys(): array
-    {
-        $privateKey = $this->keypair->getPrivateKey();
-
-        if (is_null($privateKey)) {
-            throw new RuntimeException('Invalid private key');
-        }
-
-        $resource = openssl_pkey_get_private($privateKey, $this->keypair->getPassphrase());
-        if ($resource === false) {
-            throw new RuntimeException('Invalid private key');
-        }
-
-        $details = openssl_pkey_get_details($resource);
-        if ($details === false) {
-            throw new RuntimeException('Failed to get key details');
-        }
-
-        return $this->converterToKeys($details);
-    }
-
-    public function getPublicKeys(): array
-    {
-        $publicKey = $this->keypair->getPublicKey();
-
-        if (is_null($publicKey)) {
-            throw new RuntimeException('Invalid private key');
-        }
-
-        $resource = openssl_pkey_get_public($publicKey);
-        if ($resource === false) {
-            throw new RuntimeException('Invalid public key');
-        }
-
-        $details = openssl_pkey_get_details($resource);
-        if ($details === false) {
-            throw new RuntimeException('Failed to get key details');
-        }
-
-        return $this->converterToKeys($details);
-    }
-
-    abstract protected function converterToKeys(array $details): array;
-
     /**
      * Encrypt data with provided public certificate
      *

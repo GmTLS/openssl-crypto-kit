@@ -91,13 +91,6 @@ $decrypt = $rsa->base64Decrypt($encrypt);
 var_dump($encrypt, $decrypt);
 ```
 
-### Export public key and private key signatures
-
-```php
-var_dump($rsa->getPrivateKeys());
-var_dump($rsa->getPublicKeys());
-```
-
 ## Advanced
 
 Create a new `YourProvider` class that extends `\GmTLS\CryptoKit\Providers\AbstractProvider` and implement `generateKeypair`, `converterToKeys` and the methods you need to override.
