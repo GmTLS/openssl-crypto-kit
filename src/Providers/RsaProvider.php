@@ -31,8 +31,8 @@ class RsaProvider extends AbstractProvider
         }
 
         $export = openssl_pkey_export($resource, $privateKey, $passphrase, [
-            'encrypt_key' => false,
-            'type'        => OPENSSL_KEYTYPE_RSA,
+            // 'encrypt_key' => false,
+            // 'type'        => OPENSSL_KEYTYPE_RSA,
         ]);
         if ($export === false) {
             throw new RuntimeException('[OpenSSL Error] key parameter is not a valid private key');

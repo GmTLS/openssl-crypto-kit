@@ -36,8 +36,8 @@ class EcProvider extends AbstractProvider
         }
 
         $export = openssl_pkey_export($resource, $privateKey, $passphrase, [
-            'encrypt_key' => false,
-            'type'        => OPENSSL_KEYTYPE_EC,
+            // 'encrypt_key' => false,
+            // 'type'        => OPENSSL_KEYTYPE_EC,
         ]);
         if ($export === false) {
             throw new RuntimeException('[OpenSSL Error] key parameter is not a valid private key');
