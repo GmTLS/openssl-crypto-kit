@@ -8,13 +8,13 @@ interface Keypair
 
     public function export(): KeypairExporter;
 
-    public function getPrivateKey(): ?string;
-
-    public function setPrivateKey(?string $privateKey): static;
-
     public function getPublicKey(): ?string;
 
     public function setPublicKey(?string $publicKey): static;
+
+    public function getPrivateKey(): ?string;
+
+    public function setPrivateKey(?string $privateKey): static;
 
     public function getPassphrase(): ?string;
 

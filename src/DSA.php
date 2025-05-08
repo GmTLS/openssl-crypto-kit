@@ -25,8 +25,8 @@ class DSA extends AsymmetricKey
     public function getPrivateKey(): PrivateKey
     {
         return new PrivateKey(new Keypair(
-            privateKey: $this->getKeypair()->getPrivateKey(),
             publicKey: $this->getKeypair()->getPublicKey(),
+            privateKey: $this->getKeypair()->getPrivateKey(),
             passphrase: $this->getKeypair()->getPassphrase(),
         ));
     }

@@ -5,17 +5,19 @@ namespace GmTLS\CryptoKit;
 use GmTLS\CryptoKit\Contracts\Keypair as KeypairContract;
 use GmTLS\CryptoKit\Contracts\KeypairExporter as KeypairExporterContract;
 use GmTLS\CryptoKit\Contracts\KeypairParser as KeypairParserContract;
+use RuntimeException;
 
 class Keypair implements KeypairContract
 {
     public function __construct(
-        protected ?string $privateKey = null,
         protected ?string $publicKey = null,
+        protected ?string $privateKey = null,
         protected ?string $passphrase = null,
         protected array   $options = [],
     )
     {
-        //
+        $publicKey && $this->setPublicKey($publicKey);
+        $privateKey && $this->setPrivateKey($privateKey);
     }
 
     public function parse(): KeypairParserContract
@@ -28,20 +30,6 @@ class Keypair implements KeypairContract
         return KeypairExporter::create($this);
     }
 
-    public function getPrivateKey(): ?string
-    {
-        if (is_null($this->privateKey)) {
-            return null;
-        }
-        return trim($this->privateKey);
-    }
-
-    public function setPrivateKey(?string $privateKey): static
-    {
-        $this->privateKey = $privateKey;
-        return $this;
-    }
-
     public function getPublicKey(): ?string
     {
         if (is_null($this->publicKey)) {
@@ -52,7 +40,42 @@ class Keypair implements KeypairContract
 
     public function setPublicKey(?string $publicKey): static
     {
-        $this->publicKey = $publicKey;
+        if ($publicKey) {
+            return $this->pkey($publicKey);
+        }
+        return $this;
+    }
+
+    protected function pkey(string $key, bool $isPublicKey = true): static
+    {
+        $resource = $isPublicKey ? openssl_pkey_get_public($key) : openssl_pkey_get_private($key, $this->passphrase);
+        if ($resource === false) {
+            throw new RuntimeException('Invalid key');
+        }
+
+        $details = openssl_pkey_get_details($resource);
+        if ($details === false) {
+            throw new RuntimeException('Failed to get key details');
+        }
+        $this->publicKey  = $details['key'];
+        $this->privateKey = $isPublicKey ? $this->privateKey : $key;
+        $this->options    = $details;
+        return $this;
+    }
+
+    public function getPrivateKey(): ?string
+    {
+        if (is_null($this->privateKey)) {
+            return null;
+        }
+        return trim($this->privateKey);
+    }
+
+    public function setPrivateKey(?string $privateKey): static
+    {
+        if ($privateKey) {
+            return $this->pkey($privateKey, false);
+        }
         return $this;
     }
 

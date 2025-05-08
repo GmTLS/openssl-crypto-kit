@@ -66,8 +66,8 @@ class KeypairLoader implements Contracts\KeypairLoader
         }
 
         return new Keypair(
-            privateKey: trim($privateKeyPem),
             publicKey: $details['key'],
+            privateKey: trim($privateKeyPem),
             passphrase: $passphrase,
             options: $details,
         );

@@ -39,8 +39,8 @@ class RSA extends AsymmetricKey
         }
 
         return new Keypair(
-            $privateKey,
             $details['key'],
+            $privateKey,
             $passphrase,
             $details,
         );
@@ -56,8 +56,8 @@ class RSA extends AsymmetricKey
     public function getPrivateKey(): PrivateKey
     {
         return new PrivateKey(new Keypair(
-            privateKey: $this->getKeypair()->getPrivateKey(),
             publicKey: $this->getKeypair()->getPublicKey(),
+            privateKey: $this->getKeypair()->getPrivateKey(),
             passphrase: $this->getKeypair()->getPassphrase(),
         ));
     }
