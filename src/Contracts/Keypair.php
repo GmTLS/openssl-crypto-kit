@@ -4,23 +4,9 @@ namespace GmTLS\CryptoKit\Contracts;
 
 interface Keypair
 {
-    public function fromFile(string $file, string $passphrase = null): static;
+    public function parse(): KeypairParser;
 
-    public function fromPrivateKeyFile(string $file, string $passphrase = null): static;
-
-    public function fromPublicKeyFile(string $file): static;
-
-    public function fromString(string $pemKey, string $passphrase = null): static;
-
-    public function fromPrivateKeyString(string $privateKeyPem, string $passphrase = null): static;
-
-    public function fromPublicKeyString(string $publicKeyPem): static;
-
-    public function saveKeys(string $file, bool $overwrite = false): bool;
-
-    public function savePrivateKey(string $file, bool $overwrite = false): bool;
-
-    public function savePublicKey(string $file, bool $overwrite = false): bool;
+    public function export(): KeypairExporter;
 
     public function getPrivateKey(): ?string;
 
@@ -34,13 +20,9 @@ interface Keypair
 
     public function setPassphrase(?string $passphrase): static;
 
-    public function getOptions(): array;
+    public function getOptions(string $key = null): mixed;
 
     public function setOptions(array $options): static;
-
-    public function has(string $key): bool;
-
-    public function get(string $key): mixed;
 
     public function option(string $key, mixed $value): static;
 }
