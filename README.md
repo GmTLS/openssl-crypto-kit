@@ -31,119 +31,178 @@ composer require gmtls/openssl-crypto-kit
 ### Generation
 
 ```php
-use GmTLS\CryptoKit\Providers\EcProvider;
-use GmTLS\CryptoKit\Providers\RsaProvider;
+use GmTLS\CryptoKit\EC;
+use GmTLS\CryptoKit\RSA;
 
-$key = EcProvider::generateKeypair('secp521r1', 'password');
-$key = RsaProvider::generateKeypair(1024, 'password');
+$key = EC::createKey('secp521r1', 'password');
+$key = RSA::createKey(1024, 'password');
 ```
 
 Or, load from an existing key
 
 ```php
-use GmTLS\CryptoKit\Keypair;
+use GmTLS\CryptoKit\KeypairLoader;
 
-$key = new Keypair();
-$key->fromPrivateKeyFile(realpath('private.pem'), 'password');
-$key->fromPublicKeyFile(realpath('public.pem'));
-$key->fromFile(realpath('key.pem'), 'password');
+KeypairLoader::fromPrivateKeyFile(realpath('private.pem'), 'password');
+KeypairLoader::fromPublicKeyFile(realpath('public.pem'));
+KeypairLoader::fromFile(realpath('key.pem'), 'password');
 ```
 
 Save the key to a file
 
 ```php
-$key->savePrivateKey(__DIR__ . '/private.pem');
-$key->savePublicKey(__DIR__ . '/public.pem');
-$key->saveKeys(__DIR__ . '/key.pem');
+$key->export()->savePrivateKey(__DIR__ . '/private1.pem');
+$key->export()->savePublicKey(__DIR__ . '/public1.pem');
+$key->export()->saveKeys(__DIR__ . '/key1.pem');
 ```
 
 ### Signing && Verification
 
 ```php
-use GmTLS\CryptoKit\Factory;
+use GmTLS\CryptoKit\CryptoKit;
+use GmTLS\CryptoKit\RSA;
 
-$rsa = Factory::provider($key);
-// or
-$rsa = Factory::createRsaProvider($key);
-// or
-$rsa = new RsaProvider($key);
+$key = RSA::createKey(1024, 'password');
+$rsa = CryptoKit::keypair($key);
 
 $data   = '...';
-$sign   = $rsa->sign($data);
-$verify = $rsa->verify($data, $sign);
+$sign   = $rsa->getPrivateKey()->sign($data);
+$verify = $rsa->getPublicKey()->verify($data, $sign);
 var_dump($sign, $verify);
 
-$sign   = $rsa->base64Sign($data);
-$verify = $rsa->base64Verify($data, $sign);
+$sign   = $rsa->getPrivateKey()->base64Sign($data);
+$verify = $rsa->getPublicKey()->base64Verify($data, $sign);
 var_dump($sign, $verify);
 ```
 
 ### Encryption && Decryption
 
 ```php
+use GmTLS\CryptoKit\CryptoKit;
+use GmTLS\CryptoKit\RSA;
+
+$key = RSA::createKey(1024, 'password');
+$rsa = CryptoKit::RSA($key);
+
 $data    = '...';
-$encrypt = $rsa->encrypt($data);
-$decrypt = $rsa->decrypt($encrypt);
+$encrypt = $rsa->getPublicKey()->encrypt($data);
+$decrypt = $rsa->getPrivateKey()->decrypt($encrypt);
 var_dump($encrypt, $decrypt);
 
-$encrypt = $rsa->base64Encrypt($data);
-$decrypt = $rsa->base64Decrypt($encrypt);
+$encrypt = $rsa->getPublicKey()->base64Encrypt($data);
+$decrypt = $rsa->getPrivateKey()->base64Decrypt($encrypt);
 var_dump($encrypt, $decrypt);
 ```
 
 ## Advanced
 
-Create a new `YourProvider` class that extends `\GmTLS\CryptoKit\Providers\AbstractProvider` and implement `generateKeypair`, `converterToKeys` and the methods you need to override.
+### Extensions
+
+```shell
+openssl dsaparam -out dsaparam.pem 1024
+
+openssl gendsa -out private_dsa.pem dsaparam.pem
+
+openssl dsa -in private_dsa.pem -pubout -out public_dsa.pem
+```
+
+Create a new `DSA` class that extends `\GmTLS\CryptoKit\Concerns\AsymmetricKey` and implement the methods you need to override.
 
 ```php
-use GmTLS\CryptoKit\Contracts\Keypair as KeypairContract;
+use GmTLS\CryptoKit\Concerns\AsymmetricKey;
 use GmTLS\CryptoKit\Keypair;
-use GmTLS\CryptoKit\Providers\AbstractProvider;
+use GmTLS\CryptoKit\Crypto\PrivateKey;
+use GmTLS\CryptoKit\Crypto\PublicKey;
 use RuntimeException;
 
-class YourProvider extends AbstractProvider
+class DSA extends AsymmetricKey
 {
-    public static function generateKeypair(): KeypairContract
+    public static function createKey(): Keypair
     {
-        // ...
-        return new Keypair(
-            $privateKey,
-            $details['key'],
-            $passphrase,
-            $details,
-        );
+        throw new RuntimeException('Direct generation of DSA keys is not supported');
     }
 
-    public function getKeyType(): string
+    public function getPublicKey(): PublicKey
     {
-        return '...';
+        return new PublicKey(new Keypair(
+            publicKey: $this->getKeypair()->getPublicKey()
+        ));
     }
 
-    public function getEncodedKeys(array $details = []): array
+    public function getPrivateKey(): PrivateKey
     {
-        // ...
-        return [];
+        return new PrivateKey(new Keypair(
+            privateKey: $this->getKeypair()->getPrivateKey(),
+            publicKey: $this->getKeypair()->getPublicKey(),
+            passphrase: $this->getKeypair()->getPassphrase(),
+        ));
     }
 }
 ```
 
-Extending Provider:
+Extending CryptoKit:
 
 ```php
-use GmTLS\CryptoKit\Factory;
+use GmTLS\CryptoKit\CryptoKit;
 use GmTLS\CryptoKit\Keypair;
+use GmTLS\CryptoKit\KeypairLoader;
 
-Factory::extend(YourProvider::class, function (Keypair $keypair) {
-    return new YourProvider($keypair);
+CryptoKit::extend(OPENSSL_KEYTYPE_DSA, function (Keypair $keypair) {
+    return new DSA($keypair);
 });
 ```
 
-Calling using Factory:
+Calling using CryptoKit:
 
 ```php
-Factory::provider(YourProvider::class)->sign($data);
-Factory::provider(YourProvider::class)->verify($data, $sign);
-// ...
+$keypair = KeypairLoader::fromFile(realpath('dsa.pem'));
+$dsa     = CryptoKit::keypair($keypair);
+
+$data   = '...';
+$sign   = $dsa->getPrivateKey()->sign($data);
+$verify = $dsa->getPublicKey()->verify($data, $sign);
+var_dump($sign, $verify);
+
+$sign   = $dsa->getPrivateKey()->base64Sign($data);
+$verify = $dsa->getPublicKey()->base64Verify($data, $sign);
+var_dump($sign, $verify);
+```
+
+### JWK
+
+```php
+use GmTLS\CryptoKit\RSA;
+
+$key = RSA::createKey(1024, 'password');
+echo $key->parse()->toPrivateKey('JWK');
+//{
+//    "keys": [
+//        {
+//            "kty": "RSA",
+//            "n": "...",
+//            "e": "...",
+//            "d": "...",
+//            "p": "...",
+//            "q": "...",
+//            "dp": "...",
+//            "dq": "...",
+//            "qi": "..."
+//        }
+//    ]
+//}
+```
+
+```php
+use GmTLS\CryptoKit\KeypairParser;
+
+echo KeypairParser::load($jwk)->getPublicKey();
+// -----BEGIN PRIVATE KEY-----
+// MIICdwIBAD...
+// -----END PRIVATE KEY-----
+echo KeypairParser::load($jwk)->getPrivateKey();
+// -----BEGIN PUBLIC KEY-----
+// MIGfMA0GCS...
+// -----END PUBLIC KEY-----
 ```
 
 ## License
