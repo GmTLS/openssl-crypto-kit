@@ -176,27 +176,36 @@ var_dump($sign, $verify);
 
 ### JWK
 
+Generate JWK using `RSA`:
+
 ```php
 use GmTLS\CryptoKit\RSA;
 
 $key = RSA::createKey(1024, 'password');
 echo $key->parse()->toPrivateKey('JWK');
-//{
-//    "keys": [
-//        {
-//            "kty": "RSA",
-//            "n": "...",
-//            "e": "...",
-//            "d": "...",
-//            "p": "...",
-//            "q": "...",
-//            "dp": "...",
-//            "dq": "...",
-//            "qi": "..."
-//        }
-//    ]
-//}
 ```
+
+Output:
+
+```json
+{
+    "keys": [
+        {
+            "kty": "RSA",
+            "n": "0J9js7Tmn5meaal0h1eooKtVkiAykS8WQLOjdGXHq5MX6iimYHna04N_u18bWu02OsULOFj96nuA9C4MvYdFMxPGN8v6j_a2CQRnuIoAtizy1umYkZyBT5LnTmOMG3UOqAFIXDyVrsegYHRTsn0cr8ncYUhHhpBZX7A-Ly7gbYk=",
+            "e": "AQAB",
+            "d": "yEAmmKnNMWdoam3w37ThtQ-g_LmRMFDtYD_OZv0HcwanTumkAjkVNjAkHHvHKzlE85aOFZE-caQI_Nly-z3rycbHxouVDoWSKaPFZ89yPyo-CEJYLSoEuyYVrjUthl285-5mgXf1Oi8T_EUrT_yn-QDKWpGL1YIiOLMlpsPmIB0=",
+            "p": "6GXT1Kr0u3viwmiX80ajArGnwNsL6cetlnnpN3naJ0c5Yto6tn-2mOMsCZXT0M8Uch0IDK8wT2ZPUi4y0qpaZw==",
+            "q": "5c9s6uFY0Ie8131Nx_rSenayMxZYW-tHrCH6YYRi1NQNj2AWb8MEJlSvtspE2aVLL9H0-RLJtrOXtqI4My_ijw==",
+            "dp": "h9IrUVlwmro2tuQmGjooPwTRQ_dBKSpYG1-4m4GNq_MGaO2d7tcJQqVSMW_tUVYVXvP0pmUk2OK0bRUvAswo9Q==",
+            "dq": "X8WB7qDbEox-9o8RyzWMYdz1hrTZPfVfeSzv25QAXBHDVO0GbK0pHZBNajABYXKxUsx8-xAJYEqX_1S7dxmNoQ==",
+            "qi": "sHJGFOo2PGOw0wYc8qkhDa-Qzuf4UNM-XoXwMy7UqtTgjaK_7QCaXjF5E7it3oBBnOiNutyrl2zXIerXm7-TiQ=="
+        }
+    ]
+}
+```
+
+Get the public or private key based on the JWK using KeypairParser:
 
 ```php
 use GmTLS\CryptoKit\KeypairParser;
