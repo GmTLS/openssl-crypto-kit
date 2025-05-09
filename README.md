@@ -96,7 +96,11 @@ var_dump($encrypt, $decrypt);
 
 ## Advanced
 
-### Extensions
+### Extension Algorithm
+
+Create a new `DSA` class that extends `\GmTLS\CryptoKit\Concerns\AsymmetricKey` and implement the methods you need to override.
+
+- Generate DSA Key Pair Using OpenSSL:
 
 ```shell
 openssl dsaparam -out dsaparam.pem 1024
@@ -106,7 +110,9 @@ openssl gendsa -out private_dsa.pem dsaparam.pem
 openssl dsa -in private_dsa.pem -pubout -out public_dsa.pem
 ```
 
-Create a new `DSA` class that extends `\GmTLS\CryptoKit\Concerns\AsymmetricKey` and implement the methods you need to override.
+- Extension Class – DSA Key Wrapper
+
+> The DSA class provides a wrapper for handling DSA asymmetric keys in the GmTLS\CryptoKit framework, and it extends the base class AsymmetricKey.
 
 ```php
 use GmTLS\CryptoKit\Concerns\AsymmetricKey;
@@ -140,7 +146,7 @@ class DSA extends AsymmetricKey
 }
 ```
 
-Extending CryptoKit:
+- Extending CryptoKit:
 
 ```php
 use GmTLS\CryptoKit\CryptoKit;
@@ -152,7 +158,7 @@ CryptoKit::extend(OPENSSL_KEYTYPE_DSA, function (Keypair $keypair) {
 });
 ```
 
-Calling using CryptoKit:
+- Calling using CryptoKit:
 
 ```php
 $keypair = KeypairLoader::fromFile(realpath('dsa.pem'));
