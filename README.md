@@ -48,12 +48,42 @@ KeypairLoader::fromPublicKeyFile(realpath('public.pem'));
 KeypairLoader::fromFile(realpath('key.pem'), 'password');
 ```
 
+### Exporter
+
 Save the key to a file
 
 ```php
-$key->export()->savePrivateKey(__DIR__ . '/private1.pem');
-$key->export()->savePublicKey(__DIR__ . '/public1.pem');
-$key->export()->saveKeys(__DIR__ . '/key1.pem');
+use GmTLS\CryptoKit\KeypairExporter;
+
+$keypairExporter = KeypairExporter::create($key);
+
+$keypairExporter->savePrivateKey(__DIR__ . '/private1.pem');
+$keypairExporter->savePublicKey(__DIR__ . '/public1.pem');
+$keypairExporter->saveKeys(__DIR__ . '/key1.pem');
+```
+
+### Parser
+
+```php
+use GmTLS\CryptoKit\KeypairParser;
+
+$keypairParser = KeypairParser::create($key);
+var_dump(
+    $keypairParser->toPublicKey(),
+    $keypairParser->toPrivateKey()
+);
+
+$keypairParser = KeypairParser::load($keypairParser->toPrivateKey());
+var_dump(
+    $keypairParser->getPublicKey(),
+    $keypairParser->getPrivateKey()
+);
+```
+
+Required `phpseclib/phpseclib` to use KeypairParser:
+
+```bash
+composer require phpseclib/phpseclib^3.0
 ```
 
 ### Signing && Verification
