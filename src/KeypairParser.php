@@ -35,13 +35,11 @@ class KeypairParser implements Contracts\KeypairParser
             $privateKey = null;
         }
 
-        $key = new \GmTLS\CryptoKit\Keypair(
+        return self::create(new \GmTLS\CryptoKit\Keypair(
             $publicKey,
             $privateKey,
             $passphrase
-        );
-
-        return self::create($key)->getKeypair();
+        ))->getKeypair();
     }
 
     public function toArray(string $format = 'PKCS8', array $options = []): array
