@@ -21,8 +21,7 @@
     ],
     "require": {
         "php": "^8.0",
-        "ext-openssl": "*",
-        "phpseclib/phpseclib": "^3.0"
+        "ext-openssl": "*"
     },
     "autoload": {
         "psr-4": {
@@ -33,6 +32,9 @@
         "branch-alias": {
             "dev-main": "3.x-dev"
         }
+    },
+    "suggest": {
+        "phpseclib/phpseclib": "Required ^3.0 to use \\GmTLS\\CryptoKit\\KeypairParser."
     },
     "minimum-stability": "dev",
     "prefer-stable": true
